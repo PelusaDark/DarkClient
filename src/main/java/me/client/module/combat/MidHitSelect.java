@@ -22,6 +22,9 @@ public class MidHitSelect extends Module {
     private long delay;
     private long configStartTime = 0;
     private boolean configDelayExpired = false;
+    private boolean atrun;
+    public boolean run;
+
 
     public MidHitSelect() {
         super("MidHitSelect", "Util Para Ganar Trades", Category.COMBAT);
@@ -43,55 +46,41 @@ public class MidHitSelect extends Module {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (!Util.nullCheck()) return;
-        delay = (long) Dark.instance.settingsManager.getSettingByName(this, "Delay").getValDouble();
-        updateAttackConditions();
 
+        if(run && configDelayExpired){run =false;}else if(run && !configDelayExpired){ run = false;}
+
+        delay = (long) Dark.instance.settingsManager.getSettingByName(this, "Delay").getValDouble();
+        updateAttackConditions();    
         // Verificar si el delay de configuración ha expirado
         if (!configDelayExpired && System.currentTimeMillis() > configStartTime + delay) {
             configDelayExpired = true;
+            
         }
-
-        for (EntityPlayer player : mc.theWorld.playerEntities) {
-            if (player != mc.thePlayer && isWithinDistance(mc.thePlayer, player, 5)) {
-                if (System.currentTimeMillis() - lastAttackTime >= getAttackDelay()) {
                     if (!configDelayExpired) { // Durante el delay de configuración
                         if (currentShouldAttack) {
-                            attackPlayer();
-                        }
+                            //Atacar
+                            run = true;
+                            return;
+                        }                  
                     } else { // Después del delay de configuración
-                        attackPlayer(); // Ataca siempre después del delay si hay enemigo cerca
+                        //Atacar
+                        run = true;
+                        atrun = true;
                         resetConfigDelay(); // Reinicia el temporizador de configuración después del ataque
                     }
-                }
-            }
-        }
-    }
 
-    private void attackPlayer() {
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindAttack.getKeyCode(), true);
-        KeyBinding.onTick(mc.gameSettings.keyBindAttack.getKeyCode());
-        KeyBinding.setKeyBindState(mc.gameSettings.keyBindAttack.getKeyCode(), false);
-        lastAttackTime = System.currentTimeMillis();
-    }
+            
 
+    }
     private void updateAttackConditions() {
+
         currentShouldAttack = mc.thePlayer.hurtTime > 0 && !mc.thePlayer.onGround && mc.thePlayer.moveForward != 0 || mc.gameSettings.keyBindBack.isKeyDown();
+        
     }
-
-    private long getAttackDelay() {
-        int minDelay = 70;
-        int maxDelay = 100;
-        int delayRange = maxDelay - minDelay + 1; // Calcula el rango de posibles delays
-        return minDelay + random.nextInt(delayRange); // Genera un número aleatorio dentro del rango y lo suma al mínimo
-    }
-
-    private boolean isWithinDistance(EntityPlayer player1, EntityPlayer player2, double distance) {
-        return player1.getDistanceToEntity(player2) <= distance;
-    }
-
     // Método para reiniciar el temporizador de configuración
     private void resetConfigDelay() {
         configStartTime = System.currentTimeMillis();
         configDelayExpired = false;
+        
     }
 }

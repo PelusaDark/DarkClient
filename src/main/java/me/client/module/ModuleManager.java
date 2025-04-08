@@ -39,6 +39,7 @@ public class ModuleManager {
 		this.modules.add(new MidHitSelect());
 		this.modules.add(new AutoLeave());
 		this.modules.add(new Sprint());
+        this.modules.add(new Timer());        
         this.modules.add(new Bhop());
         this.modules.add(new NoJumpDelay());
 		this.modules.add(new Parkour());

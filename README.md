@@ -10,15 +10,15 @@ nah bueno pasala bien crack y recuerda el **dicho** :
 
 "**El que diga que Un Mod Tiene Virus sin haber visto el src, Es un Pendejo.**"
 
-**ACTUALIZACIÓN 2.0 :**
-- AimAssist Mejorado
-- Retoques a OneHitSelect
-- AutoClicker Reprogramado (basado en lowkey, tiene buena randomizacion)
+**ACTUALIZACIÓN 2.1 :**
 - ChatBypass (EN DESARROLLO)
 - Retoques a AutoLeave
 - Añadido TimmingHit
 - Retoques al JumpReset
-- **Y muchas mejoras mas....**
+- LegitVelocity
+- MidHitSelect (BETA)
+- Bhop (BETA)
+- Y otras cosas mas
 
 Y Perdon Si Ves Fallos Ortográficos, Codigos Desordenados, Codigo Inecesario, etc. También Aprovecho A Agradecer Al Equipo De **lowkey, herocode, Liquidbounce, raven b++, y skilled**, Ya Que Me Pude Guiar De Algunos De Sus Módulos.
 

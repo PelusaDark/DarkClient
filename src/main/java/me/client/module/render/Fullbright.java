@@ -17,7 +17,7 @@ public class Fullbright extends Module
     
     @Override
     public void onEnable() {
-        if (!Util.nullCheck() || (Dark.instance.destructed))
+        if (mc.theWorld == null || (Dark.instance.destructed))
             return;
         this.mc.gameSettings.gammaSetting = 1000.0f;
     }

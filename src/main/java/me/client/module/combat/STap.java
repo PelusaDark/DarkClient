@@ -39,7 +39,8 @@ public class STap extends Module {
         Dark.instance.settingsManager.rSetting(new Setting("delay (ms)", this, 2, 0, 100, true));
         Dark.instance.settingsManager.rSetting(new Setting("MinDist", this, 1.5, 0, 6, false));
         Dark.instance.settingsManager.rSetting(new Setting("MaxDist", this, 3.5, 0, 6, false));
-
+        Dark.instance.settingsManager.rSetting(new Setting("OnlyOnGround", this, false));
+        
     }
 
     @SubscribeEvent
@@ -63,7 +64,9 @@ public class STap extends Module {
 
             Entity target = mc.objectMouseOver.entityHit;
             if (flag) {
-            if (mc.gameSettings.keyBindForward.isKeyDown() && !mc.gameSettings.keyBindBack.isKeyDown() && target != null) {
+            boolean OnlyGroundOpt = Dark.instance.settingsManager.getSettingByName(this, "OnlyOnGround").getValBoolean();
+            boolean isOnGround = mc.thePlayer.onGround;
+            if (mc.gameSettings.keyBindForward.isKeyDown() && !mc.gameSettings.keyBindBack.isKeyDown() && target != null && (isOnGround || !OnlyGroundOpt)) {
                 double distance = event.player.getDistanceToEntity(target);
                 if (distance >= MinDist && distance <= MaxDist && System.currentTimeMillis() - lastActivationTime >= Cooldown) {
 

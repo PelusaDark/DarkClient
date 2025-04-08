@@ -23,7 +23,7 @@ public class Parkour extends Module {
 
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (Util.nullCheck())
+        if (!Util.nullCheck())
             return;
 
         if (mc.thePlayer.onGround && !mc.thePlayer.isSneaking()) {

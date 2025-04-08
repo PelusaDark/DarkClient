@@ -85,7 +85,7 @@ public class AimAssist extends Module {
                     ++this.tru;
                 }
 
-                if (this.tru >= 5) {
+                if (this.tru >= 30) {
                     this.tru = 0;
                     return;
                 }

@@ -11,7 +11,7 @@ import me.client.module.util.Util;
 import me.client.module.Category;
 import me.client.module.Module;
 import me.client.settings.Setting;
-
+import me.client.module.combat.MidHitSelect;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -56,7 +56,7 @@ public class AutoClicker extends Module
     private static Field bff;
     private boolean acthitselect;
     private ReceiveHits receiveHits;
-
+    private MidHitSelect midHitSelectInstance;
     public AutoClicker() {
         super("Autoclicker", "", Category.COMBAT);
         this.r = new Random();
@@ -69,6 +69,9 @@ public class AutoClicker extends Module
         Dark.instance.settingsManager.rSetting(new Setting("CPS Boost Amount", this, 2.0, 0.0, 5.0, true)); // Nueva setting para la cantidad del boost de CPS
         Dark.instance.settingsManager.rSetting(new Setting("Click Delay Variance", this, 5.0, 0.0, 20.0, true)); // Nueva setting para la varianza del delay del click
         Dark.instance.settingsManager.rSetting(new Setting("Release Delay Variance", this, 8.0, 0.0, 20.0, true)); // Nueva setting para la varianza del delay de release
+
+
+        
 
     }   
 
@@ -83,9 +86,11 @@ public class AutoClicker extends Module
         if (receiveHits == null) {
             receiveHits = (ReceiveHits) Dark.instance.moduleManager.getModule("ReceiveHits");
         }
-        
+        if (midHitSelectInstance == null) {
+            midHitSelectInstance = (MidHitSelect) Dark.instance.moduleManager.getModule("MidHitSelect");
+        }
         if(receiveHits !=null && Dark.instance.moduleManager.getModule("ReceiveHits").isToggled() && !receiveHits.isHab()) return;
-
+        if(midHitSelectInstance != null && Dark.instance.moduleManager.getModule("MidHitSelect").isToggled() && !midHitSelectInstance.run)return;
 
         Min = (int) Dark.instance.settingsManager.getSettingByName(this, "Min").getValDouble();
         Max = (int) Dark.instance.settingsManager.getSettingByName(this, "Max").getValDouble();
@@ -96,7 +101,6 @@ public class AutoClicker extends Module
         }
         if(swordActivado && !isSwordInHand())return;
 
-        if (AutoClicker.mc.currentScreen == null) {
             Mouse.poll();
             if (Mouse.isButtonDown(0)) {
                 if (this.nld > 0L && this.nlu > 0L) {
@@ -123,7 +127,7 @@ public class AutoClicker extends Module
                 this.nlu = 0L;
                 this.nld = 0L;
             }
-        }
+        
     }
 
     private boolean isSwordInHand() {
@@ -135,7 +139,7 @@ public class AutoClicker extends Module
 
     private void vcx() {
         final double mcc = Min;
-        final double mca = Max;
+        final double mca = Max+1;
         if (mcc > mca) {
             return;
         }
@@ -158,16 +162,16 @@ public class AutoClicker extends Module
             else {
                 this.dr = false;
             }
-            this.nd = System.currentTimeMillis() + 200L + this.r.nextInt(1200);
+            this.nd = System.currentTimeMillis() + 300L + this.r.nextInt(1300);
         }
         if (this.dr) {
             delay *= (long)this.drr;
         }
         if (System.currentTimeMillis() > this.ne) {
             if (this.r.nextInt(100) >= 50) {
-                delay += 20L + this.r.nextInt(120);
+                delay += 20L + this.r.nextInt(135);
             }
-            this.ne = System.currentTimeMillis() + 200L + this.r.nextInt(1200);
+            this.ne = System.currentTimeMillis() + 400L + this.r.nextInt(1380);
         }
 
         double clickVariance = Dark.instance.settingsManager.getSettingByName(this, "Click Delay Variance").getValDouble();

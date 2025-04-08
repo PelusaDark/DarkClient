@@ -16,8 +16,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-
+import io.netty.util.internal.ThreadLocalRandom;
 import java.util.List;
+import java.util.Random;
 
 public class Wtap extends Module {
 
@@ -27,21 +28,27 @@ public class Wtap extends Module {
     private boolean flag = false;
     private boolean wasAttackKeyDown = false;
     private static final Minecraft mc = Minecraft.getMinecraft();
-
-    private float durationMs;
-    private float cooldownMs;
+    public Random ra;
+    private int durationMs;
+    private int cooldownMs;
     private int delayMs;
     private float minDist;
     private float maxDist;
+    private int sRandom;
     private final double rayTraceReach = 6.0;
 
     public Wtap() {
+        
         super("WTap", "Auto W-Tap con Raytrace", Category.COMBAT);
+
+        this.ra = new Random();
         Dark.instance.settingsManager.rSetting(new Setting("Duracion (ms)", this, 150, 5, 200, true));
         Dark.instance.settingsManager.rSetting(new Setting("Cooldown (ms)", this, 300, 10, 400, true));
         Dark.instance.settingsManager.rSetting(new Setting("Delay (ms)", this, 2, 0, 100, true));
         Dark.instance.settingsManager.rSetting(new Setting("MinDist", this, 1.5, 0, 6, false));
         Dark.instance.settingsManager.rSetting(new Setting("MaxDist", this, 3.5, 0, 6, false));
+        Dark.instance.settingsManager.rSetting(new Setting("Small Random", this, 10, 0, 100, true));
+        
         Dark.instance.settingsManager.rSetting(new Setting("OnlyOnGround", this, false));
         
     }
@@ -58,11 +65,12 @@ public class Wtap extends Module {
 
 
     private void updateSettings() {
-        this.durationMs = (float) Dark.instance.settingsManager.getSettingByName(this, "Duracion (ms)").getValDouble();
-        this.cooldownMs = (float) Dark.instance.settingsManager.getSettingByName(this, "Cooldown (ms)").getValDouble();
+        this.durationMs = (int) Dark.instance.settingsManager.getSettingByName(this, "Duracion (ms)").getValDouble();
+        this.cooldownMs = (int) Dark.instance.settingsManager.getSettingByName(this, "Cooldown (ms)").getValDouble();
         this.delayMs = (int) Dark.instance.settingsManager.getSettingByName(this, "Delay (ms)").getValDouble();
         this.minDist = (float) Dark.instance.settingsManager.getSettingByName(this, "MinDist").getValDouble();
         this.maxDist = (float) Dark.instance.settingsManager.getSettingByName(this, "MaxDist").getValDouble();
+        this.sRandom = (int) Dark.instance.settingsManager.getSettingByName(this, "Small Random").getValDouble();
     }
 
 
@@ -70,14 +78,14 @@ public class Wtap extends Module {
     public void tickEvent(TickEvent.ClientTickEvent event) {
         if (!Util.nullCheck() || event.phase != Phase.END) return;
         updateSettings();
-
+        
         boolean isAttackKeyDown = mc.gameSettings.keyBindAttack.isKeyDown();
-
+        
         if (isAttackKeyDown && !wasAttackKeyDown) {
             flag = true;
         }
          wasAttackKeyDown = isAttackKeyDown;
-
+        double randomdelay =  this.ra.nextDouble() * sRandom;
         if (flag) {
               
             boolean OnlyGroundOpt = Dark.instance.settingsManager.getSettingByName(this, "OnlyOnGround").getValBoolean();
@@ -87,7 +95,7 @@ public class Wtap extends Module {
 
             if (mc.gameSettings.keyBindForward.isKeyDown() && target != null && isSprinting && (isOnGround || !OnlyGroundOpt)) {
                 double distance = getRayTraceDistance(target);
-                if (distance >= minDist && distance <= maxDist && System.currentTimeMillis() - lastCooldownAct >= cooldownMs) {
+                if (distance >= minDist && distance <= maxDist && System.currentTimeMillis() - lastCooldownAct >= (cooldownMs + randomdelay)) {
                     lastActivationTime = System.currentTimeMillis();
                     isWDeengaged = true;
                     lastCooldownAct = System.currentTimeMillis();
@@ -98,7 +106,7 @@ public class Wtap extends Module {
 
 
         if (isWDeengaged) {
-            if (System.currentTimeMillis() - lastActivationTime >= durationMs) {
+            if (System.currentTimeMillis() - lastActivationTime >= (durationMs + randomdelay)) {
                 isWDeengaged = false;
             } else {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
@@ -107,12 +115,10 @@ public class Wtap extends Module {
         }
 
         if (!isWDeengaged) {
-            if (mc.currentScreen instanceof GuiScreen) {
-                KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
-            } else {
+
                 boolean shouldBePressed = Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode());
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), shouldBePressed);
-            }
+            
         }
     }
 
